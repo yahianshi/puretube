@@ -1,0 +1,26 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor Files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build & Package Output
+dist/
+build/
+*.crx
+*.zip
+*.pem
+
+# Logs & System
+*.log
+.system_generated/

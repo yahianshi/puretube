@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PureTube</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <img src="icons/icon48.png" alt="PureTube" class="brand-icon">
+      <span class="brand-text">PureTube</span>
+      <span class="brand-badge">PRO</span>
+    </div>
+    <div class="status-indicator" id="status-container" title="YouTube Status">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Standby</span>
+    </div>
+  </header>
+
+  <!-- Audio Controls Section -->
+  <section class="section">
+    <div class="section-title">
+      <span>Audio Master</span>
+    </div>
+
+    <!-- Volume Booster -->
+    <div class="volume-control-block">
+      <div class="volume-header">
+        <span class="label-title">Volume Booster</span>
+        <span class="volume-val-badge" id="volume-label">100%</span>
+      </div>
+      <input type="range" min="100" max="600" step="10" value="100" class="slider-range" id="volume-slider">
+      <div class="volume-presets">
+        <button class="btn-preset active" data-volume="100">100%</button>
+        <button class="btn-preset" data-volume="200">200%</button>
+        <button class="btn-preset" data-volume="300">300%</button>
+        <button class="btn-preset" data-volume="500">500%</button>
+      </div>
+    </div>
+
+    <!-- Silence Skipper -->
+    <div class="control-row" style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;">
+      <div class="control-label">
+        <span class="label-title">Silence Skipper</span>
+        <span class="label-sub" id="silence-sub">Dynamic jump-cut dead air</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="silence-toggle">
+        <span class="slider-toggle"></span>
+      </label>
+    </div>
+
+    <!-- Silence Aggressiveness Slider (Only visible when Silence Skipper is active) -->
+    <div class="silence-slider-block" id="silence-slider-container">
+      <div class="silence-slider-header">
+        <span class="slider-sub-title">Aggressiveness</span>
+        <span class="silence-val-badge" id="silence-val-badge">50%</span>
+      </div>
+      <input type="range" min="0" max="100" value="50" class="slider-range slider-range-silence" id="silence-slider" aria-label="Skip Less / Skip More">
+      <div class="slider-axis-labels">
+        <span class="axis-label axis-less">Skip Less</span>
+        <span class="axis-label axis-more">Skip More</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SponsorBlock Section -->
+  <section class="section">
+    <div class="section-title">
+      <span>SponsorBlock API</span>
+    </div>
+    <div class="control-row">
+      <div class="control-label">
+        <span class="label-title">Auto-Skip Segments</span>
+        <span class="label-sub" id="sponsor-sub">Sponsors, intros & self-promos</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="sponsor-toggle">
+        <span class="slider-toggle"></span>
+      </label>
+    </div>
+
+    <!-- Advanced Categories Accordion -->
+    <div class="sponsor-advanced-toggle" id="sponsor-advanced-btn">
+      <span class="advanced-title">Categories to Skip</span>
+      <span class="advanced-arrow" id="sponsor-arrow">▼</span>
+    </div>
+
+    <div class="sponsor-categories-panel" id="sponsor-categories-panel">
+      <label class="category-item">
+        <span class="category-badge-dot dot-sponsor"></span>
+        <span class="category-name">Sponsors</span>
+        <input type="checkbox" class="cat-checkbox" data-cat="sponsor">
+      </label>
+      <label class="category-item">
+        <span class="category-badge-dot dot-intro"></span>
+        <span class="category-name">Intros & Outros</span>
+        <input type="checkbox" class="cat-checkbox" data-cat="intro" data-cat-extra="outro">
+      </label>
+      <label class="category-item">
+        <span class="category-badge-dot dot-selfpromo"></span>
+        <span class="category-name">Self-promotion / Merch</span>
+        <input type="checkbox" class="cat-checkbox" data-cat="selfpromo">
+      </label>
+      <label class="category-item">
+        <span class="category-badge-dot dot-interaction"></span>
+        <span class="category-name">Interaction (Like/Sub)</span>
+        <input type="checkbox" class="cat-checkbox" data-cat="interaction">
+      </label>
+      <label class="category-item">
+        <span class="category-badge-dot dot-preview"></span>
+        <span class="category-name">Preview & Recap</span>
+        <input type="checkbox" class="cat-checkbox" data-cat="preview">
+      </label>
+      <label class="category-item">
+        <span class="category-badge-dot dot-filler"></span>
+        <span class="category-name">Filler / Tangent</span>
+        <input type="checkbox" class="cat-checkbox" data-cat="filler">
+      </label>
+      <label class="category-item">
+        <span class="category-badge-dot dot-music"></span>
+        <span class="category-name">Non-Music Section</span>
+        <input type="checkbox" class="cat-checkbox" data-cat="music_offtopic">
+      </label>
+    </div>
+  </section>
+
+  <!-- UI Debloater Section -->
+  <section class="section">
+    <div class="section-title">
+      <span>UI Debloater</span>
+    </div>
+
+    <!-- Hide Shorts -->
+    <div class="control-row">
+      <div class="control-label">
+        <span class="label-title">Hide YouTube Shorts</span>
+        <span class="label-sub">Tabs, shelves & sidebar entries</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="shorts-toggle">
+        <span class="slider-toggle"></span>
+      </label>
+    </div>
+
+    <!-- Hide Comments -->
+    <div class="control-row">
+      <div class="control-label">
+        <span class="label-title">Hide Comments</span>
+        <span class="label-sub">Clean distraction-free discussion</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="comments-toggle">
+        <span class="slider-toggle"></span>
+      </label>
+    </div>
+
+    <!-- Hide Related Videos -->
+    <div class="control-row">
+      <div class="control-label">
+        <span class="label-title">Hide Related Sidebar</span>
+        <span class="label-sub">Center player & remove watch next</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="related-toggle">
+        <span class="slider-toggle"></span>
+      </label>
+    </div>
+  </section>
+
+  <!-- Time Saved Statistics Section -->
+  <section class="stats-section">
+    <div class="stats-header">
+      <div class="stats-title-group">
+        <svg class="stats-icon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+          <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+        </svg>
+        <span class="stats-title">Time Saved</span>
+      </div>
+      <button class="stats-reset-btn" id="stats-reset-btn" title="Reset statistics">Reset</button>
+    </div>
+
+    <div class="stats-grid">
+      <!-- Total Time Saved Card -->
+      <div class="stat-card">
+        <span class="stat-label">Total Time Saved</span>
+        <span class="stat-value" id="stat-total-saved">0s</span>
+        <span class="stat-sub" id="stat-breakdown">0s sponsors • 0s silence</span>
+      </div>
+
+      <!-- Average Saved per 30m Card -->
+      <div class="stat-card">
+        <span class="stat-label">Avg. per 30 min</span>
+        <span class="stat-value highlight" id="stat-avg-30m">0s</span>
+        <span class="stat-sub" id="stat-avg-sub">based on watch time</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Pure CSS injection • Single Web Audio graph
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+/* ==========================================================================
+   PureTube - High-Performance UI Debloater (Pure CSS, Zero MutationObserver)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. YouTube Shorts: Shelves, Tabs, Sidebar & Navigation Entries
+   -------------------------------------------------------------------------- */
+
+/* Sidebar / Navigation Shorts Items */
+html[data-puretube-hide-shorts="true"] ytd-guide-entry-renderer:has(a[href^="/shorts"]),
+html[data-puretube-hide-shorts="true"] ytd-guide-entry-renderer:has(a[title*="Shorts"]),
+html[data-puretube-hide-shorts="true"] ytd-mini-guide-entry-renderer:has(a[href^="/shorts"]),
+html[data-puretube-hide-shorts="true"] ytd-mini-guide-entry-renderer:has(a[title*="Shorts"]),
+html[data-puretube-hide-shorts="true"] tp-yt-paper-item:has(a[href^="/shorts"]),
+html[data-puretube-hide-shorts="true"] a#endpoint[title="Shorts"],
+html[data-puretube-hide-shorts="true"] ytm-pivot-bar-item-renderer:has([aria-label*="Shorts"]) {
+  display: none !important;
+}
+
+/* Home Feed, Channel Feed, & Search Shorts Shelves */
+html[data-puretube-hide-shorts="true"] ytd-rich-shelf-renderer[is-shorts],
+html[data-puretube-hide-shorts="true"] ytd-rich-shelf-renderer:has(ytd-rich-grid-shorts-shelf-renderer),
+html[data-puretube-hide-shorts="true"] ytd-rich-grid-shorts-shelf-renderer,
+html[data-puretube-hide-shorts="true"] ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html[data-puretube-hide-shorts="true"] ytd-rich-section-renderer:has(ytd-rich-grid-shorts-shelf-renderer),
+html[data-puretube-hide-shorts="true"] ytd-reel-shelf-renderer,
+html[data-puretube-hide-shorts="true"] ytd-shelf-renderer:has(a[href^="/shorts"]),
+html[data-puretube-hide-shorts="true"] ytm-reel-shelf-renderer {
+  display: none !important;
+}
+
+/* Individual Shorts In Search Results & Feed Grids */
+html[data-puretube-hide-shorts="true"] ytd-video-renderer:has(a[href^="/shorts"]),
+html[data-puretube-hide-shorts="true"] ytd-reel-item-renderer,
+html[data-puretube-hide-shorts="true"] ytd-rich-item-renderer:has(a[href^="/shorts"]) {
+  display: none !important;
+}
+
+/* Channel Header Shorts Tabs & Chips */
+html[data-puretube-hide-shorts="true"] yt-tab-shape[tab-title="Shorts"],
+html[data-puretube-hide-shorts="true"] tp-yt-paper-tab:has(.tab-content[aria-label="Shorts"]),
+html[data-puretube-hide-shorts="true"] tp-yt-paper-tab:has(div[aria-label="Shorts"]),
+html[data-puretube-hide-shorts="true"] yt-chip-cloud-chip-renderer:has(yt-formatted-string[title="Shorts"]) {
+  display: none !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   2. Comments Section
+   -------------------------------------------------------------------------- */
+
+html[data-puretube-hide-comments="true"] #comments,
+html[data-puretube-hide-comments="true"] ytd-comments,
+html[data-puretube-hide-comments="true"] ytd-item-section-renderer:has(#comments),
+html[data-puretube-hide-comments="true"] ytm-comment-section-renderer {
+  display: none !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   3. Related Videos Sidebar (Watch Next)
+   -------------------------------------------------------------------------- */
+
+html[data-puretube-hide-related="true"] #secondary,
+html[data-puretube-hide-related="true"] #secondary-inner,
+html[data-puretube-hide-related="true"] #related,
+html[data-puretube-hide-related="true"] ytd-watch-next-secondary-results-renderer,
+html[data-puretube-hide-related="true"] #below #related {
+  display: none !important;
+}
+
+/* Layout centering when Related Videos are hidden */
+html[data-puretube-hide-related="true"] #columns.ytd-watch-flexy {
+  justify-content: center !important;
+}
+
+html[data-puretube-hide-related="true"] ytd-watch-flexy[flexy]:not([theater]):not([fullscreen]) #primary.ytd-watch-flexy {
+  max-width: 1280px !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   4. PureTube In-Player Skip Notification Popup
+   -------------------------------------------------------------------------- */
+
+.puretube-toast-container {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 1px rgba(255, 255, 255, 0.3);
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(-10px) scale(0.96);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.puretube-toast-container.puretube-toast-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.puretube-toast-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #00d775;
+  color: #0a0a0a;
+}
+
+.puretube-toast-badge.puretube-badge-intro,
+.puretube-toast-badge.puretube-badge-outro {
+  background: #00a2ff;
+  color: #ffffff;
+}
+
+.puretube-toast-badge.puretube-badge-selfpromo {
+  background: #ffff00;
+  color: #0a0a0a;
+}
+
+.puretube-toast-badge.puretube-badge-interaction {
+  background: #cc00ff;
+  color: #ffffff;
+}
+
+.puretube-toast-text {
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.puretube-toast-saved {
+  color: #00d775;
+  font-weight: 600;
+}
+
+.puretube-toast-unskip {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.puretube-toast-unskip:hover {
+  background: rgba(0, 215, 117, 0.3);
+  border-color: #00d775;
+  color: #ffffff;
+  transform: scale(1.04);
+}
+
+
+/* --------------------------------------------------------------------------
+   5. SponsorBlock Seekbar Highlighting
+   -------------------------------------------------------------------------- */
+
+.puretube-seekbar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 34;
+}
+
+.puretube-seekbar-segment {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 1px;
+  pointer-events: auto;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+  box-sizing: border-box;
+}
+
+.puretube-seekbar-segment:hover {
+  opacity: 1;
+  filter: brightness(1.25);
+  cursor: pointer;
+}
+
+/* Category Color Highlights */
+.puretube-seekbar-segment.puretube-cat-sponsor {
+  background-color: #00d775 !important;
+  box-shadow: 0 0 3px rgba(0, 215, 117, 0.4);
+}
+
+.puretube-seekbar-segment.puretube-cat-intro,
+.puretube-seekbar-segment.puretube-cat-outro {
+  background-color: #00a2ff !important;
+  box-shadow: 0 0 3px rgba(0, 162, 255, 0.4);
+}
+
+.puretube-seekbar-segment.puretube-cat-selfpromo {
+  background-color: #ffff00 !important;
+  box-shadow: 0 0 3px rgba(255, 255, 0, 0.4);
+}
+
+.puretube-seekbar-segment.puretube-cat-interaction {
+  background-color: #cc00ff !important;
+  box-shadow: 0 0 3px rgba(204, 0, 255, 0.4);
+}
+
+.puretube-seekbar-segment.puretube-cat-preview,
+.puretube-seekbar-segment.puretube-cat-filler {
+  background-color: #9d4edd !important;
+}
+
+.puretube-seekbar-segment.puretube-cat-music_offtopic {
+  background-color: #ff8800 !important;
+}
