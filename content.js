@@ -34,7 +34,9 @@
   // --- Single Audio Graph State ---
   let audioCtx = null;
   let sourceNode = null;
+  let filterNode = null;
   let gainNode = null;
+  let compressorNode = null;
   let analyserNode = null;
   let audioBuffer = null;
   let currentVideo = null;
@@ -395,8 +397,42 @@
   function applyVolumeGain() {
     if (!gainNode || !audioCtx) return;
     try {
-      const multiplier = Math.max(0, (settings.volumeBoost || 100) / 100);
-      gainNode.gain.setTargetAtTime(multiplier, audioCtx.currentTime, 0.015);
+      const vol = Math.max(0, parseInt(settings.volumeBoost, 10) || 100);
+      const multiplier = vol / 100;
+      const now = audioCtx.currentTime;
+
+      // 1. Smoothly set gain multiplier
+      gainNode.gain.setTargetAtTime(multiplier, now, 0.015);
+
+      // 2. Intelligent Dynamic Limiting & Anti-Distortion
+      if (compressorNode) {
+        if (multiplier <= 1.0) {
+          // Transparent / bypass at 100% or lower (no compression)
+          compressorNode.threshold.setTargetAtTime(0, now, 0.015);
+          compressorNode.ratio.setTargetAtTime(1, now, 0.015);
+        } else {
+          // Adaptive threshold & ratio to cleanly compress peaks without digital clipping
+          const compressionDepth = Math.min(1.0, (multiplier - 1.0) / 5.0);
+          const targetThreshold = -14 - (compressionDepth * 12); // -14 dB at 150% down to -26 dB at 600%
+          const targetRatio = 8 + (compressionDepth * 8);        // 8:1 to 16:1
+
+          compressorNode.threshold.setTargetAtTime(targetThreshold, now, 0.015);
+          compressorNode.knee.setTargetAtTime(28, now, 0.015);
+          compressorNode.ratio.setTargetAtTime(targetRatio, now, 0.015);
+          compressorNode.attack.setTargetAtTime(0.003, now, 0.015);
+          compressorNode.release.setTargetAtTime(0.18, now, 0.015);
+        }
+      }
+
+      // 3. Tame sub-bass rumble so speakers and vocal overtones don't distort into mud
+      if (filterNode) {
+        if (multiplier <= 1.0) {
+          filterNode.frequency.setTargetAtTime(20, now, 0.015); // Sub-audible, bypass
+        } else {
+          // Roll off subsonic rumble below 85 Hz to preserve speech vocal clarity
+          filterNode.frequency.setTargetAtTime(85, now, 0.015);
+        }
+      }
     } catch (e) {
       console.warn('[PureTube] Error updating volume gain:', e);
     }
@@ -417,16 +453,34 @@
       }
 
       sourceNode = audioCtx.createMediaElementSource(video);
-      gainNode = audioCtx.createGain();
-      analyserNode = audioCtx.createAnalyser();
 
+      // 1. Vocal clarity / sub-rumble filter
+      filterNode = audioCtx.createBiquadFilter();
+      filterNode.type = 'highpass';
+      filterNode.frequency.setValueAtTime(20, audioCtx.currentTime);
+
+      // 2. Volume Gain Node
+      gainNode = audioCtx.createGain();
+
+      // 3. Dynamic Range Compressor / Anti-Clipping Limiter
+      compressorNode = audioCtx.createDynamicsCompressor();
+      compressorNode.threshold.setValueAtTime(0, audioCtx.currentTime);
+      compressorNode.ratio.setValueAtTime(1, audioCtx.currentTime);
+
+      // 4. Analyser Node for silence detection
+      analyserNode = audioCtx.createAnalyser();
       analyserNode.fftSize = 512;
       analyserNode.smoothingTimeConstant = 0.1;
       audioBuffer = new Float32Array(analyserNode.fftSize);
 
-      sourceNode.connect(gainNode);
-      gainNode.connect(analyserNode);
-      analyserNode.connect(audioCtx.destination);
+      // Audio pipeline to speakers: source -> filter -> gain -> compressor -> destination
+      sourceNode.connect(filterNode);
+      filterNode.connect(gainNode);
+      gainNode.connect(compressorNode);
+      compressorNode.connect(audioCtx.destination);
+
+      // Independent tap from sourceNode for silence detection (unaffected by volume changes)
+      sourceNode.connect(analyserNode);
 
       video.__puretube_connected = true;
       currentVideo = video;
@@ -859,6 +913,10 @@
           speed: request.speed,
           paddingMs: request.paddingMs
         });
+        sendResponse({ success: true });
+      } else if (request.action === 'UPDATE_VOLUME') {
+        settings.volumeBoost = request.volumeBoost;
+        applyVolumeGain();
         sendResponse({ success: true });
       } else if (request.action === 'TOGGLE_SILENCE_SKIPPER') {
         silenceEngine.setEnabled(request.enabled);

@@ -109,13 +109,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function setVolume(value) {
-    const val = parseInt(value, 10);
+  function sendVolumeUpdateToTab(vol) {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs && tabs[0]?.id) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'UPDATE_VOLUME',
+          volumeBoost: vol
+        }).catch(() => {});
+      }
+    });
+  }
+
+  function setVolume(value, saveToStorage = true) {
+    const val = Math.min(600, Math.max(0, parseInt(value, 10) || 100));
     volumeSlider.value = val;
     volumeLabel.textContent = `${val}%`;
     updatePresetButtons(val);
 
-    chrome.storage.sync.set({ volumeBoost: val });
+    // Instant real-time volume adjustment
+    sendVolumeUpdateToTab(val);
+
+    if (saveToStorage) {
+      chrome.storage.sync.set({ volumeBoost: val });
+    }
   }
 
   // Load saved settings
@@ -193,18 +209,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Volume Slider Events
   volumeSlider.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value, 10);
-    volumeLabel.textContent = `${val}%`;
-    updatePresetButtons(val);
+    setVolume(e.target.value, false);
   });
 
   volumeSlider.addEventListener('change', (e) => {
-    setVolume(e.target.value);
+    setVolume(e.target.value, true);
   });
 
   presetButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      setVolume(btn.dataset.volume);
+      setVolume(btn.dataset.volume, true);
     });
   });
 
